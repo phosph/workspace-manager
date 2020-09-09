@@ -1,5 +1,9 @@
 #!/usr/bin/bash
 
+if ! command -v workspace &> /dev/null; then
+  return
+fi
+
 __autocomplection_wks() {
   if [ -z "$WORKSPACE_PATH" ]; then
     WORKSPACE_PATH="$HOME/Work"
@@ -31,4 +35,4 @@ __autocomplection_wks() {
   return 0
 }
 
-complete -F __autocomplection_wks workspace
+complete -o default -F __autocomplection_wks workspace
