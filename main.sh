@@ -1,89 +1,88 @@
 #!/usr/bin/bash
 
-if [ -z "$WORKSPACE_PATH" ]
-then
-    export WORKSPACE_PATH="$HOME/Work"
+if [ -z "$WORKSPACE_PATH" ]; then
+  export WORKSPACE_PATH="$HOME/Work"
 fi
 
-
-_workspace_init() {
-
-    case $1 in
-        --help) echo \
+_workspace_init_help() {
+  echo \
 "workspace-init usage:
-    workspace init NAME [ --repo|-r GIT-REPO ]
+  workspace init NAME [ --repo|-r GIT-REPO ]
 
-    NAME    será el nombre del workspace
+  NAME    será el nombre del workspace
 
 se creará con la siquiente estructura:
-    \$NAME
-    ├── core
-    └── doc
+  \$NAME
+  ├── core
+  └── doc
 
 opciones:
-    --repo | -r GIT-REPO    se clona el repositiorio GIT-REPO con git y se entrará en el
-                            directorio que haya sido creado
+  --repo | -r GIT-REPO    se clona el repositiorio GIT-REPO con git y se entrará en el
+                          directorio que haya sido creado
 
 nota:
-    si se proporciona un GIT-REPO, se irá al path que este genere, una vez dentro, si
-    se detecta que es un proyecto no instalable, se correrá 'yarn install' o 'npm install'
-    según sea el caso
+  si se proporciona un GIT-REPO, se irá al path que este genere, una vez dentro, si
+  se detecta que es un proyecto no instalable, se correrá 'yarn install' o 'npm install'
+  según sea el caso
 "
-            return 0
-        ;;
+  return 0
+}
+
+_workspace_init() {
+  cd $WORKSPACE_PATH;
+
+  new_workspace="$1"
+  shift;
+
+  mkdir -p $new_workspace/{core,doc}
+  tree $new_workspace
+  cd "$new_workspace/core"
+
+  if [ ! -z "$1" ]
+  then
+    case $1 in
+      --repo | -r)
+        if [ ! -z "$2" ]; then
+          git clone $2
+          a=(`ls ./`)
+          cd "${a[0]}"
+          if [ -f "./package.json" ]; then
+            if [ -f "./yarn.lock" ]; then
+              yarn install
+            elif [ -f "package-lock.json" ]; then
+              npm i
+            fi
+          fi
+          shift
+          shift
+        fi
+      ;;
     esac
+  fi
 
-    cd $WORKSPACE_PATH;
-
-    new_workspace="$1"
-    shift;
-
-    mkdir -p $new_workspace/{core,doc}
-    tree $new_workspace
-    cd "$new_workspace/core"
-
-    if [ ! -z "$1" ]
-    then
-        case $1 in
-            --repo | -r)
-                if [ ! -z "$2" ]
-                then
-                    git clone $2
-                    a=(`ls ./`)
-                    cd "${a[0]}"
-                    if [ -f "./package.json" ]
-                    then
-                        if [ -f "./yarn.lock" ]
-                        then
-                            yarn install
-                        elif [ -f "package-lock.json" ]
-                        then
-                            npm i
-                        fi
-                    fi
-                    shift
-                    shift
-                fi
-            ;;
-        esac
-    fi
+  return 0
 }
 
 _workspace_cd() {
-    if [ ! -z "$1" ] && [ -d "$WORKSPACE_PATH/$1" ]
-    then
-        ruta="$WORKSPACE_PATH/$1"
+  if [ ! -z "$1" ] && [ -d "$WORKSPACE_PATH/$1" ]; then
 
-        if [ ! -z "$2" ] && [ -d "$ruta/$2" ]
-        then
-            ruta="$ruta/$2"
-        else
-            ruta="$ruta/core"
-        fi
-        cd $ruta
+    ruta="$WORKSPACE_PATH/$1"
+
+    if [ ! -z "$2" ] && [ -d "$ruta/$2" ]; then
+      ruta="$ruta/$2"
     else
-        cd "$WORKSPACE_PATH"
+      ruta="$ruta/core"
     fi
+
+    cd $ruta
+
+  else
+
+    cd "$WORKSPACE_PATH"
+
+  fi
+
+  return 0
 }
 
 _workspace_help() {
@@ -106,10 +105,6 @@ opciones
 se puede utilizar la variable de entorno \$WORKSPACE_PATH para establecer dónde se crearán
 los proyectos (workspaces). default WORKSPACE_PATH=\"\$HOME/Work\"
 
-ALIAS
-    wks   -> workspace
-    wkscd -> workspace cd
-
 EJEMPLOS
     workspace cd
     workspace cd Tyba
@@ -118,30 +113,27 @@ EJEMPLOS
 # WORKSPACE_NAME      nombre de algún workspace ya creado
 #     sub-path        cualquier sub path dentro \$WORKSPACE_PATH/\$WORKSPACE_NAME/
 #                     default es core
+  return 0
 }
 
 workspace() {
 
-    case $1 in
-        init | i)
-            shift
-            _workspace_init $@
-            ;;
+  case $1 in
+    --help | -h ) _workspace_help ;;
 
-        cd|go)
-            shift
-            _workspace_cd $@
-            ;;
+    init | i) shift; _workspace_init $@ ;;
 
-        help)
-            if case "$2" in (init) true ;; (*) false; esac; then
-                _workspace_init --help
-            else
-                _workspace_help
-            fi
-            ;;
-        --help | -h | *) _workspace_help ;;
-    esac
+    cd | go) shift; _workspace_cd $@ ;;
+
+    help)
+      case "$2" in
+        init | i ) _workspace_init_help ;;
+        *        ) _workspace_help
+      esac
+      ;;
+
+    *) _workspace_help; return 1 ;;
+  esac
 
 }
 
