@@ -1,48 +1,34 @@
 #!/usr/bin/bash
 
-#
-# _autocomplection_wks() {
-#     # echo $COMP_WORDS
-#     if [ -z "$WORKSPACE_PATH" ]
-#     then
-#         WORKSPACE_PATH="$HOME/Work"
-#     fi
-#     if [ "${#COMP_WORDS[@]}" = "2" ]; then
-#         COMPREPLY=($(compgen -W "init i cd go help --help -h" "${COMP_WORDS[1]}"))
-#     elif [ "${#COMP_WORDS[@]}" = "3" ]; then
-#         if [ "${COMP_WORDS[1]}" = 'help' ]; then
-#             COMPREPLY=($(compgen -W "init go cd" "${COMP_WORDS[2]}"))
-#         else
-#             COMPREPLY=($(compgen -W "$(ls $WORKSPACE_PATH)" "${COMP_WORDS[2]}"))
-#         fi
-#     elif [ "${#COMP_WORDS[@]}" = "4" ]; then
-#         COMPREPLY=($(compgen -W "$(ls "$WORKSPACE_PATH/${COMP_WORDS[2]}")" "${COMP_WORDS[3]}"))
-#     fi
-# }
-#
-#
-# _autocomplection_wkscd() {
-#     # echo $COMP_WORDS
-#     if [ -z "$WORKSPACE_PATH" ]
-#     then
-#         WORKSPACE_PATH="$HOME/Work"
-#     fi
-#     if [ "${#COMP_WORDS[@]}" = "2" ]; then
-#         if [ "${COMP_WORDS[1]}" = 'help' ]; then
-#             COMPREPLY=($(compgen -W "init go cd" "${COMP_WORDS[1]}"))
-#         else
-#             COMPREPLY=($(compgen -W "$(ls $WORKSPACE_PATH)" "${COMP_WORDS[1]}"))
-#         fi
-#     elif [ "${#COMP_WORDS[@]}" = "2" ]; then
-#         COMPREPLY=($(compgen -W "$(ls "$WORKSPACE_PATH/${COMP_WORDS[1]}")" "${COMP_WORDS[2]}"))
-#     fi
-# }
-#
-#
-#
-#
-# alias wks="source `cd "$(dirname "${BASH_SOURCE[0]}")" && pwd`/main.sh"
-# complete -F _autocomplection_wks ws
-#
-# alias wkscd="source `cd "$(dirname "${BASH_SOURCE[0]}")" && pwd`/main.sh go"
-# complete -F _autocomplection_wkscd wkscd
+__autocomplection_wks() {
+  if [ -z "$WORKSPACE_PATH" ]; then
+    WORKSPACE_PATH="$HOME/Work"
+  fi
+
+  command_named=$1
+  current_word_called=$2
+  word_before_called=$3
+
+  if [ "${#COMP_WORDS[@]}" = "2" ]; then
+
+    COMPREPLY=($(compgen -W "init i cd go help --help -h" "${current_word_called}"))
+
+  elif [ "${#COMP_WORDS[@]}" = "3" ]; then
+
+    case $word_before_called in
+      cd | go ) COMPREPLY=($(compgen -W "`ls $WORKSPACE_PATH 2> /dev/null`" "${current_word_called}")) ;;
+      help    ) COMPREPLY=($(compgen -W "init i cd go" "${current_word_called}")) ;;
+    esac
+
+  elif [ "${#COMP_WORDS[@]}" = "4" ]; then
+
+    case "${COMP_WORDS[1]}" in
+      cd | go ) COMPREPLY=($(compgen -W "`ls "$WORKSPACE_PATH/$word_before_called" 2> /dev/null`" "${current_word_called}")) ;;
+    esac
+
+  fi
+
+  return 0
+}
+
+complete -F __autocomplection_wks workspace
