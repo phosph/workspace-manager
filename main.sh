@@ -62,11 +62,16 @@ _workspace_cd() {
 
   return 0
 }
+_workspace_list() {
+  echo "current workspace path: $WORKSPACE_PATH"
+  ls $WORKSPACE_PATH
+}
 
 workspace() {
 
   case $1 in
     --help | -h ) _workspace_help ;;
+    list | ls ) _workspace_list ;;
 
     init | i) shift; _workspace_init $@ ;;
 
