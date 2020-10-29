@@ -77,11 +77,12 @@ workspace() {
         init | i ) _workspace_init_help ;;
         *        ) _workspace_help
       esac
-      ;;
+    ;;
 
     *) _workspace_help; return 1 ;;
   esac
 
+  return 0
 }
 
 alias wrk='workspace'
