@@ -84,4 +84,6 @@ workspace() {
 
 }
 
+alias wrk='workspace'
+
 export -f workspace

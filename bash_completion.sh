@@ -36,3 +36,4 @@ __autocomplection_wks() {
 }
 
 complete -o default -F __autocomplection_wks workspace
+complete -o default -F __autocomplection_wks wrk
