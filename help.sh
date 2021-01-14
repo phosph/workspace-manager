@@ -1,29 +1,5 @@
 #!/usr/bin/bash
 
-_workspace_init_help() {
-  echo \
-"workspace-init usage:
-  workspace init NAME [ --repo|-r GIT-REPO ]
-
-  NAME    será el nombre del workspace
-
-se creará con la siquiente estructura:
-  \$NAME
-  ├── core
-  └── doc
-
-opciones:
-  --repo | -r GIT-REPO    se clona el repositiorio GIT-REPO con git y se entrará en el
-                          directorio que haya sido creado
-
-nota:
-  si se proporciona un GIT-REPO, se irá al path que este genere, una vez dentro, si
-  se detecta que es un proyecto no instalable, se correrá 'yarn install' o 'npm install'
-  según sea el caso
-"
-  return 0
-}
-
 _workspace_help() {
   echo \
 "workspace usage
@@ -56,5 +32,5 @@ EJEMPLOS
 }
 
 
-export -f _workspace_init_help
+# export -f _workspace_init_help
 export -f _workspace_help

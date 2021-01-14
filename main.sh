@@ -6,90 +6,50 @@ fi
 
 source "$WORKSPACE_DIR/help.sh"
 
-_workspace_init() {
-  cd $WORKSPACE_PATH;
-
-  new_workspace="$1"
-  shift;
-
-  mkdir -p $new_workspace/{core,doc}
-  tree $new_workspace
-  cd "$new_workspace/core"
-
-  if [ ! -z "$1" ]
-  then
-    case $1 in
-      --repo | -r)
-        if [ ! -z "$2" ]; then
-          git clone $2
-          a=(`ls ./`)
-          cd "${a[0]}"
-          if [ -f "./package.json" ]; then
-            if [ -f "./yarn.lock" ]; then
-              yarn install
-            elif [ -f "package-lock.json" ]; then
-              npm i
-            fi
-          fi
-          shift
-          shift
-        fi
-      ;;
-    esac
-  fi
-
-  return 0
-}
-
-_workspace_cd() {
-  if [ ! -z "$1" ] && [ -d "$WORKSPACE_PATH/$1" ]; then
-
-    ruta="$WORKSPACE_PATH/$1"
-
-    if [ ! -z "$2" ] && [ -d "$ruta/$2" ]; then
-      ruta="$ruta/$2"
-    else
-      ruta="$ruta/core"
-    fi
-
-    cd $ruta
-
-  else
-
-    cd "$WORKSPACE_PATH"
-
-  fi
-
-  return 0
-}
-_workspace_list() {
-  echo "current workspace path: $WORKSPACE_PATH"
-  ls $WORKSPACE_PATH
-}
-
 workspace() {
-
   case $1 in
+    list | ls ) $WORKSPACE_DIR/lib/list.sh $WORKSPACE_PATH ;;
+
+    init | i) shift; $WORKSPACE_DIR/lib/create.sh $WORKSPACE_PATH $@ ;;
+
+    cd | go)
+      shift;
+      ruta=`$WORKSPACE_DIR/lib/go.sh $WORKSPACE_PATH $@`
+      if [ ! -z "$ruta" ]; then
+        cd $ruta
+      else
+        cd $WORKSPACE_PATH
+        return 1
+      fi
+    ;;
+
+    path)
+      shift;
+      ruta=`$WORKSPACE_DIR/lib/go.sh $WORKSPACE_PATH $@`
+      if [ ! -z "$ruta" ]; then
+        echo $ruta
+        return 0
+      else
+        return 1
+      fi
+    ;;
+
     --help | -h ) _workspace_help ;;
-    list | ls ) _workspace_list ;;
-
-    init | i) shift; _workspace_init $@ ;;
-
-    cd | go) shift; _workspace_cd $@ ;;
-
+    
     help)
       case "$2" in
-        init | i ) _workspace_init_help ;;
-        *        ) _workspace_help
+        init | i ) ./lib/create.sh -h ;;
+        *        ) _workspace_help ;;
       esac
     ;;
 
-    *) _workspace_help; return 1 ;;
+    *)
+      _workspace_help;
+      cd $WORKSPACE_PATH
+    ;;
   esac
 
   return 0
 }
-
-alias wrk='workspace'
 
 export -f workspace
