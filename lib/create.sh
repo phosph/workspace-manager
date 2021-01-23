@@ -54,7 +54,7 @@ if [ ! -z "$1" ]; then
 fi
 
 
-mkdir -p "$new_workspace/{core,doc}"
+mkdir -p $new_workspace/{core,doc}
 
 if [ ! -z "$repo" ]; then
   # clone

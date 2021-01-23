@@ -4,24 +4,41 @@
 source "$WORKSPACE_DIR/help.sh"
 
 workspace() {
-  case $1 in
+  option=$1
+  shift
+  case $option in
     list | ls ) $WORKSPACE_DIR/lib/list.sh $WORKSPACE_PATH ;;
 
-    init | i) shift; $WORKSPACE_DIR/lib/create.sh $WORKSPACE_PATH $@ ;;
+    init | i) $WORKSPACE_DIR/lib/create.sh $WORKSPACE_PATH $@ ;;
 
     cd | go)
-      shift;
       ruta=`$WORKSPACE_DIR/lib/go.sh $WORKSPACE_PATH $@`
       if [ ! -z "$ruta" ]; then
         cd $ruta
+        newPath=`$WORKSPACE_DIR/lib/add-remove-path.sh add $WORKSPACE_PATH $@`
+        if [ ! -z "$newPath" ]; then
+          export PATH="$newPath"
+        fi
       else
         cd $WORKSPACE_PATH
         return 1
       fi
     ;;
 
+    exit)
+      newPath=`$WORKSPACE_DIR/lib/add-remove-path.sh remove $WORKSPACE_PATH`
+      if [ ! -z "$newPath" ]; then
+        export PATH="$newPath"
+      fi
+    ;;
+    addEnv)
+      newPath=`$WORKSPACE_DIR/lib/add-remove-path.sh add $WORKSPACE_PATH $@`
+      if [ ! -z "$newPath" ]; then
+        export PATH="$newPath"
+      fi
+    ;;
+
     path)
-      shift;
       ruta=`$WORKSPACE_DIR/lib/go.sh $WORKSPACE_PATH $@`
       if [ ! -z "$ruta" ]; then
         echo $ruta
@@ -32,16 +49,8 @@ workspace() {
     ;;
 
     current)
-      shift;
       $WORKSPACE_DIR/lib/current.sh $WORKSPACE_PATH $@
       return $?
-      # local wrkPath=`realpath $WORKSPACE_PATH`
-      # # echo $wrkPath
-      # local a=`realpath --relative-to="$wrkPath" .`
-      # list=(${a//\// })
-      # echo ${list[0]}
-     #   count=${#list[@]}
-      # return 1
     ;;
 
     --help | -h ) _workspace_help ;;
