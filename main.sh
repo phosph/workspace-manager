@@ -1,8 +1,5 @@
 #!/usr/bin/bash
 
-if [ -z "$WORKSPACE_PATH" ]; then
-  export WORKSPACE_PATH="$HOME/Work"
-fi
 
 source "$WORKSPACE_DIR/help.sh"
 
@@ -34,8 +31,21 @@ workspace() {
       fi
     ;;
 
+    current)
+      shift;
+      $WORKSPACE_DIR/lib/current.sh $WORKSPACE_PATH $@
+      return $?
+      # local wrkPath=`realpath $WORKSPACE_PATH`
+      # # echo $wrkPath
+      # local a=`realpath --relative-to="$wrkPath" .`
+      # list=(${a//\// })
+      # echo ${list[0]}
+     #   count=${#list[@]}
+      # return 1
+    ;;
+
     --help | -h ) _workspace_help ;;
-    
+
     help)
       case "$2" in
         init | i ) ./lib/create.sh -h ;;
