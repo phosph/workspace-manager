@@ -29,12 +29,18 @@ workspace() {
       newPath=`$WORKSPACE_DIR/lib/add-remove-path.sh remove $WORKSPACE_PATH`
       if [ ! -z "$newPath" ]; then
         export PATH="$newPath"
+        return 0
+      else
+        return 1
       fi
     ;;
     addEnv)
       newPath=`$WORKSPACE_DIR/lib/add-remove-path.sh add $WORKSPACE_PATH $@`
       if [ ! -z "$newPath" ]; then
         export PATH="$newPath"
+        return 0
+      else
+        return 1
       fi
     ;;
 
