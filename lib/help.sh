@@ -1,5 +1,3 @@
-#!/usr/bin/bash
-
 print_help() {
 echo \
 "workspace usage
@@ -25,12 +23,4 @@ EJEMPLOS
     workspace cd Tyba
     workspace cd Tyba doc
 "
-# WORKSPACE_NAME      nombre de algún workspace ya creado
-#     sub-path        cualquier sub path dentro \$WORKSPACE_PATH/\$WORKSPACE_NAME/
-#                     default es core
-#   return 0
 }
-
-
-# export -f _workspace_init_help
-# export -f _workspace_help

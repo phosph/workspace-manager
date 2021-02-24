@@ -11,6 +11,7 @@ $(cat lib/list.sh)
 $(cat lib/path.sh)
 $(cat lib/go.sh)
 $(cat lib/current.sh)
+$(cat lib/add-remove-path.sh)
 $(cat lib/workspace.sh)
 
 ################

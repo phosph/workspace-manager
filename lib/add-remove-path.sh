@@ -1,25 +1,23 @@
-workspace_path=$2
-workspace=$3
+setWorkspaceScripts() {
+  case $1 in
+    add)
+      local wrkPath=`workspaceExits $2 2>/dev/null`
+      local wrkPathParsed=`realpath $wrkPath`
+      if [ -d "${wrkPathParsed}/scripts" ]; then
+        echo "export ${PATH}:${wrkPathParsed}/scripts"
+        return 0
+      else
+        return 1
+      fi
+    ;;
+    remove)
+      local wrkPath="`workspaceExits $2 2>/dev/null`/scripts"
+      local wrkPathParsed=`realpath $wrkPath`
+      local newPATH=`echo ":${PATH}:" | sed -e "s|:${wrkPathParsed}:|:|g" -e 's|^:||' -e 's|:$||'`
+      echo "export $newPATH"
+      return 0
+    ;;
+    *) return 1 ;;
+  esac
 
-add() {
-  wrkPath="`realpath $workspace_path`/workspace"
-  if [ -d "${wrkPath}/script" ]; then
-    echo "${PATH}:${wrkPath}/script"
-    return 0
-  else
-    return 1
-  fi
 }
-remove() {
-  wrkPath="`realpath $workspace_path`/workspace"
-  echo ":${PATH}:" | sed -e "s|:${wrkPath}:|:|g" -e 's|^:||' -e 's|:$||'
-  return 0
-}
-
-case $1 in
-  add) add ;;
-  remove) remove ;;
-  *) exit 1
-esac
-
-exit $?
