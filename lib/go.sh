@@ -1,20 +1,24 @@
-#!/usr/bin/env bash
-workspace_path=$1
-shift
+goWorkspace() {
+  if workspaceExits $1 &>/dev/null; then
 
-if [ ! -z "$1" ] && [ -d "$workspace_path/$1" ]; then
+    local wrkPath=`workspaceExits $1 2>/dev/null`
 
-  ruta="$workspace_path/$1"
+    if [ ! -z "$2" ] && [ -d "$wrkPath/$2" ]; then
+      wrkPath="$wrkPath/$2"
+    elif [ -d "$wrkPath/core" ]; then
+      wrkPath="$wrkPath/core"
+      local listFiles=(`ls $wrkPath`)
+      if [ ${#listFiles[@]} = 1 ]; then
+        wrkPath="$wrkPath/${listFiles[0]}"
+      fi
+    fi
 
-  if [ ! -z "$2" ] && [ -d "$ruta/$2" ]; then
-    ruta="$ruta/$2"
+
+
+    echo "cd $wrkPath"
+
+    return 0
   else
-    ruta="$ruta/core"
+    return 1
   fi
-
-  echo "$ruta"
-
-  exit 0
-else
-  exit 1
-fi
+}

@@ -1,15 +1,14 @@
-workspace_path=$1
-
 currentName() {
-  wrkPath=`realpath $workspace_path`
+  wrkPath=`realpath $WORKSPACE_PATH`
   list=(`realpath --relative-to="$wrkPath" . | sed 's/\// /g'`)
   name=${list[0]}
   if [ "$name" = '.' ]; then
     echo _base_
   elif [ "$name" = '..' ]; then
+    echo
     return 1
   else
-    list=`$WORKSPACE_DIR/lib/list.sh $workspace_path 2>/dev/null`
+    list=`$WORKSPACE_DIR/lib/list.sh $WORKSPACE_PATH 2>/dev/null`
     if [[ $list =~ (^|[[:space:]])"$name"($|[[:space:]]) ]]; then
       echo $name
       return 0
@@ -21,14 +20,14 @@ currentName() {
 }
 
 currentIn() {
-  wrkPath=`realpath $workspace_path`
+  wrkPath=`realpath $WORKSPACE_PATH`
   list=(` realpath --relative-to="$wrkPath" . | sed 's/\// /g'`)
   name=${list[0]}
 
   if [ "$name" = '.' ] || [ "$name" = '..' ]; then
     return 1
   else
-    list=`$WORKSPACE_DIR/lib/list.sh $workspace_path 2>/dev/null`
+    list=`$WORKSPACE_DIR/lib/list.sh $WORKSPACE_PATH 2>/dev/null`
     if [[ $list =~ (^|[[:space:]])"$name"($|[[:space:]]) ]]; then
       realpath --relative-to="$wrkPath/$name" `pwd`
       return 0
@@ -38,9 +37,11 @@ currentIn() {
   fi
 }
 
-case $2 in
-  --inner) currentIn ;;
-  *) currentName ;;
-esac
+current() {
+  case $1 in
+    --inner) currentIn ;;
+    *) currentName ;;
+  esac
 
-exit $?
+  return $?
+}

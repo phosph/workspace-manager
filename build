@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+[ ! -f dist ] &&  rm -rf dist
+mkdir dist
+# main
+
+echo \
+"#!/usr/bin/env bash
+
+$(cat lib/help.sh)
+$(cat lib/list.sh)
+$(cat lib/path.sh)
+$(cat lib/go.sh)
+$(cat lib/current.sh)
+$(cat lib/workspace.sh)
+
+################
+
+$(cat main.sh)
+" >  dist/workspace
+
+chmod +x dist/workspace

@@ -1,6 +1,4 @@
-#!/usr/bin/env bash
-
-workspace_path=$1
-
-echo "current workspace path: $workspace_path" 1>&2
-ls $workspace_path
+list() {
+  echo "current workspace path: $WORKSPACE_PATH" 1>&2
+  ls $WORKSPACE_PATH
+}
