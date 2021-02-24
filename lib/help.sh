@@ -1,26 +1,28 @@
+#!/usr/bin/env bash
+
 print_help() {
-echo \
-"workspace usage
-
-    workspace COMMAND ...
-    workspace [-h|--help]
-
+cat <<EOF
+"uso $PROGNAME [-i | init] [-g | go ] [-l | list] [-p | path ] [-c | current]
+               [-h | --help] [-e | execute]
 
 commands:
-    init                  inicializa un nuev0 workspace
-    cd [WORKSPACE_PATH]   cambia el directorio actual por el del workspace
-    go                    alias de cd
-    help COMMAND
+    create [...args]            crea un nuevo workspace
+    -g | go <WORKSPACE_NAME>    cambia el directorio actual por el del workspace
+    -l | list                   lista los proyecto en WORKSPACE_PATH
+    -p | path <WORKSPACE_NAME>  imprime la ruta del workspace
+    -c | current [...args]      actúa sobre el workspace actual
+    -h | --help                 imprime este mensaje
+    env
+    -e | execute <command>      (WIP)
+    help <COMMAND>
 
-opciones
-    --help | -h         imprime este mensaje
 
-se puede utilizar la variable de entorno \$WORKSPACE_PATH para establecer dónde se crearán
-los proyectos (workspaces). default WORKSPACE_PATH=\"\$HOME/Work\"
+variables de entorno:
+   \$WORKSPACE_PATH=<ABSOLUTE_PATH>  establece dónde están los proyectos (workspaces).
 
 EJEMPLOS
-    workspace cd
-    workspace cd Tyba
-    workspace cd Tyba doc
-"
+    $PROGNAME go
+    $PROGNAME go Tyba
+    $PROGNAME go Tyba doc
+EOF
 }

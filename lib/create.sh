@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 create() {
   case $1 in
     -h | --help)
@@ -55,7 +57,7 @@ create() {
 
   if [ ! -z "$repo" ]; then
     # clone
-    cd "$new_workspace/core"
+    cd "$new_workspace/core" || return
     if [ ! -z "$repo_name" ]; then
       git clone $repo "$repo_name"
     else
@@ -63,8 +65,9 @@ create() {
     fi
 
     # install if js project
-    a=(`ls ./`)
-    cd "${a[0]}"
+    # a=(`ls ./`)
+    mapfile -t a < <(ls ./)
+    cd "${a[0]}" || return
     if [ -f "./package.json" ]; then
       if [ -f "./yarn.lock" ]; then
         yarn install
