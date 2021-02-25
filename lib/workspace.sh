@@ -50,7 +50,7 @@ case $OPTION in
   -e | exec    ) execute $@ ;;
   init          ) create_env $@ ;;
   -h           ) print_help ;;
-  -v           ) echo "0.3-alpah"; return 0 ;;
+  -v           ) echo "0.3-alpha";;
 
   help )
     case $1 in
