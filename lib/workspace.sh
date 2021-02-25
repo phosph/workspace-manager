@@ -42,15 +42,13 @@ OPTION=$1
 shift
 
 case $OPTION in
-  # rmEnv     ) setWorkspaceScripts remove $@ ;;
-  # addEnv    ) setWorkspaceScripts add $@ ;;
   create       ) create $@ ;;
   -l | list    ) list $@ ;;
   -g | go      ) go_workspace $@ ;;
   -p | path    ) path $@ ;;
   -c | current ) current $@ ;;
   -e | exec    ) execute $@ ;;
-  env          ) create_env $@ ;;
+  init          ) create_env $@ ;;
   -h           ) print_help ;;
   -v           ) echo "0.3-alpah"; return 0 ;;
 
