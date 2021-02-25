@@ -8,8 +8,20 @@
 # shellcheck source="./help.sh"
 # shellcheck source="./execute.sh"
 # shellcheck source="./create_env.sh"
+
+get_real_path() {
+  SOURCE="${BASH_SOURCE[0]}"
+  while [ -h "$SOURCE" ]; do # resolve $SOURCE until the file is no longer a symlink
+    DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
+    SOURCE="$(readlink "$SOURCE")"
+    [[ $SOURCE != /* ]] && SOURCE="$DIR/$SOURCE" # if $SOURCE was a relative symlink, we need to resolve it relative to the path where the symlink file was located
+  done
+  DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
+  echo $DIR
+}
+
 readonly PROGNAME=$(basename $0)
-readonly PROGDIR=$(readlink -m "$(dirname $0)")
+readonly PROGDIR="`get_real_path`"
 
 source "$PROGDIR/list.sh"
 source "$PROGDIR/create.sh"
@@ -40,6 +52,7 @@ case $OPTION in
   -e | exec    ) execute $@ ;;
   env          ) create_env $@ ;;
   -h           ) print_help ;;
+  -v           ) echo "0.3-alpah"; return 0 ;;
 
   help )
     case $1 in

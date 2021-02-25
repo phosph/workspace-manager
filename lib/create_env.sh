@@ -3,10 +3,10 @@
 # readonly PROGDIR=$(readlink -m "$(dirname $0)")
 
 create_env() {
-  echo "alias workspace_manager='$PROGDIR/workspace.sh'"
+  # echo "alias workspace_manager='$PROGDIR/workspace.sh'"
   echo '
     workspace-s() {
-      if [[ $WORKSPACE_PATH == '' ]]; then
+      if [[ $WORKSPACE_PATH == "" ]]; then
        echo "\$WORKSPACE_PATH is not set"
        return 1
       fi
