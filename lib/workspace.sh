@@ -58,6 +58,7 @@ case $OPTION in
     case $1 in
       current ) current -h ;;
       go      ) go_workspace -h ;;
+      exec      ) execute -h ;;
       *       ) print_help ;;
     esac
   ;;
