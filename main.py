@@ -14,8 +14,6 @@ def _get_wrkspace_home():
     current_path=getcwd()
     
     if current_path.startswith(environ['WORKSPACE_ROOT']):
-        print('estamos en el root', file=sys.stderr)
-
         wrk_name=current_path.split('/')[len(environ['WORKSPACE_ROOT'].split('/'))]
 
         return path.join(environ['WORKSPACE_ROOT'], wrk_name)
@@ -139,6 +137,9 @@ def main():
         elif args.go != None:
             go_wrkspace(args.go, args.current, args.zone)
             sys.exit(3)
+        
+        elif args.current:
+            print(path.split(_get_wrkspace_home())[-1])
 
         else:
             parser.print_help()
