@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+
 from os import makedirs
 from os import environ
 from os import popen
@@ -8,6 +9,9 @@ from os import listdir
 from os import system
 import sys
 import argparse
+import locale;
+# vary depending on your lang/locale
+locale.setlocale(locale.LC_ALL, 'es_AR.UTF-8')
 
 
 def _get_wrkspace_home():
@@ -30,24 +34,25 @@ def create_wrkspace(rootDir):
 
 def go_wrkspace(go_path, current, zone):
     if current:
-        wrk_home=_get_wrkspace_home()
+        wrk_home = _get_wrkspace_home()
 
         if wrk_home == '': raise Exception('You are not in a workspace')
 
-        resolved_path=path.join(
+        resolved_path = path.join(
             wrk_home,
             zone,
             go_path
         )
 
     else:
-        if go_path == None: raise Exception('--go must have a name')
-        
-        resolved_path=path.join(
-            environ['WORKSPACE_ROOT'],
-            go_path,
-            zone,
-        )
+        if go_path == None or go_path == '':
+            resolved_path = environ['WORKSPACE_ROOT']
+        else:
+            resolved_path = path.join(
+                environ['WORKSPACE_ROOT'],
+                go_path,
+                zone,
+            )
     
     if not path.exists(resolved_path): raise Exception('workspace is invalid')
 
@@ -122,10 +127,10 @@ def main():
     
         elif args.list:
             print('workspaces:')
-            wrkspaces_list=listdir(environ['WORKSPACE_ROOT'])
+            wrkspaces_list = listdir(environ['WORKSPACE_ROOT'])
             for wrkspace in wrkspaces_list:
                 if path.isdir(path.join(environ['WORKSPACE_ROOT'], wrkspace)):
-                    print(f"\t{wrkspace}")
+                    print(f"\t{wrkspace}", flush=True)
 
         elif args.path != None:
             if args.current: print(_get_wrkspace_home())
