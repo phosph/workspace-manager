@@ -27,13 +27,16 @@ _validate_workspace_root() {
 
     # local WORKSPACE_ROOT=
     if [[ $WORKSPACE_ROOT ]]; then
+        echo "$WORKSPACE_ROOT" >&2
         if [[ ! -e "$WORKSPACE_ROOT/.workspace"  ]]; then
+            echo "workspace invalid" >&2
             return 1;
         fi
     else
         WORKSPACE_ROOT="$(__workspace_folder_worspace)"
 
         if [[ ! $WORKSPACE_ROOT ]]; then
+            echo "workspace root not found" >&2
             return 1;
         fi
     fi
@@ -94,6 +97,9 @@ Commands:
     path <WORKSPACE>
     path -c|--current
     \t prints the workspace path. If --current is provided instead, the current workdpsace will be printed if any
+
+    create <WORKSPACE>
+    \t create a new worspace
 "
 }
 
@@ -151,7 +157,10 @@ workspace-path() {
             WORKSPACE_PATH="${WORKSPACE_PATH%/*}"
         done
 
-        [[ "$WORKSPACE_PATH" == "" ]] && return 1;
+        [[ "$WORKSPACE_PATH" == "" ]] && {
+            echo "workspace not found" >&2
+            return 1;
+        }
         # WORKSPACE_NAME="$(basename "$WORKSPACE_PATH")"
     else
         # WORKSPACE_NAME="$1"
@@ -159,6 +168,7 @@ workspace-path() {
     fi
 
     if [[ ! -d "$WORKSPACE_PATH" || ! -e "$WORKSPACE_PATH/.wrkspace" ]]; then
+        echo "Invalid workspace" >&2
         return 1;
     fi
 
@@ -177,13 +187,16 @@ workspace-go() {
     local ZONE="core"
 
     if [[ "$1" =~ ^-z|(-zone)$ ]]; then
-        [[ -z "$2" ]] && return 1;
+        [[ -z "$2" ]] && {
+            echo "Invalid zone" >&2
+            return 1;
+        }
 
         ZONE="$2"
     fi
 
     if [[ ! -d "$WORKSPACE_PATH/$ZONE" ]]; then
-        echo "zone '$ZONE' does not exist";
+        echo "zone '$ZONE' does not exist" >&2;
         return 1;
     else
         WORKSPACE_PATH="$WORKSPACE_PATH/$ZONE"
@@ -202,11 +215,38 @@ workspace() {
     if [ $return_value -eq 3 ]; then
         eval "$output"
     else
-        echo "$output"
+        cd "$output"
         return $return_value;
     fi
 }
 '
+}
+
+workspace-create() {
+    _validate_workspace_root;
+
+    local WORKSPACE_NAME="$1"
+
+    local WORKSPACE_PATH
+
+    WORKSPACE_PATH="$WORKSPACE_ROOT/${WORKSPACE_NAME}"
+
+    if [[ -e $WORKSPACE_PATH ]]; then
+        echo "Workspace $WORKSPACE_NAME already exist" >&2
+        exit 1;
+    fi
+
+    mkdir -p "${WORKSPACE_PATH}"/{core,doc};
+
+    cd "${WORKSPACE_PATH}"
+
+    echo "WORKSPACE_NAME=\"${WORKSPACE_NAME}\""> .wrkspace
+
+    cd ./core;
+
+    pwd
+
+    exit 3;
 }
 
 workspace() {
@@ -222,21 +262,8 @@ workspace() {
         go) workspace-go "$@";;
         list) workspace-list "$@";;
         path) workspace-path "$@";;
+        create) workspace-create "$@";;
     esac
-
-    # if [[ "$1" == 'ps1' ]]; then
-    #     _workspace_get_currents
-    # elif [[ "$1" == 'new-root' ]]; then
-    #     "$(_workspace_get_real_path)/workspace-root-createor.sh"
-    # else
-    #     output=$("$(_workspace_get_real_path)/main.py" "$@")
-    #     if [ $? -eq 3 ]; then
-    #         eval "$output"
-    #     else
-    #         echo "$output"
-    #     fi
-    # fi
 }
 
-# [[ "$1" == 'ps1' ]] &&
 workspace "$@"
