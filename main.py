@@ -116,7 +116,7 @@ def main():
     args = parser.parse_args()
 
     try:
-        if args.create != None:
+        if args.create:
             create_wrkspace(path.join(environ['WORKSPACE_ROOT'], args.create))
 
             go_wrkspace(args.create, False, 'core')
@@ -132,14 +132,14 @@ def main():
                 if path.isdir(path.join(environ['WORKSPACE_ROOT'], wrkspace)):
                     print(f"\t{wrkspace}", flush=True)
 
-        elif args.path != None:
+        elif args.path:
             if args.current: print(_get_wrkspace_home())
             else:
                 if args.path == None or args.path == '': raise Exception('must suply a worspace name')
                 if not path.isdir(path.join(environ['WORKSPACE_ROOT'], args.path)): raise Exception('invald workspace name')
                 print(path.join(environ['WORKSPACE_ROOT'], args.path))
 
-        elif args.go != None:
+        elif args.go:
             go_wrkspace(args.go, args.current, args.zone)
             sys.exit(3)
         
