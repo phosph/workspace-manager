@@ -54,7 +54,7 @@ workspace_ps1() {
     source <(
         # shellcheck disable=SC1091
         source "$WORKSPACE_ROOT/.workspace";
-        echo "WORKSPACE_NAME=$WORKSPACE_NAME"
+        echo "WORKSPACE_NAME='$WORKSPACE_NAME'"
     )
 
     local -r current_path="$(realpath --relative-to="$WORKSPACE_ROOT" .)"
@@ -80,11 +80,12 @@ workspace_ps1() {
     fi
 
     local -r ZONE="$(echo "$current_path" | cut -d "/" -f2)"
-    local -r SUBPATH="$(realpath --relative-to="$WORKSPACE_ROOT/$WORSPACE_PROJECT_PATH/${ZONE}" .)"
+    local SUBPATH
+    SUBPATH="$(realpath --relative-to="$WORKSPACE_ROOT/$WORSPACE_PROJECT_PATH/${ZONE}" .)"
 
-    # z=($(echo "${s[1]}" | sed "s/\// /"))
+    [[ "$SUBPATH" == '.' ]] && SUBPATH="";
 
-    echo "$WORKSPACE_NAME ${WORSPACE_PROJECT_NAME} ${ZONE} ${SUBPATH}"
+    echo "$WORKSPACE_NAME;${WORSPACE_PROJECT_NAME};${ZONE};${SUBPATH}"
 }
 
 workspace_help() {
