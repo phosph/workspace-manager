@@ -262,6 +262,11 @@ workspace() {
         list) workspace-list "$@";;
         path) workspace-path "$@";;
         create) workspace-create "$@";;
+        *)
+            echo -e "invalid command\n"
+            workspace_help;
+            exit 1
+        ;;
     esac
 }
 
