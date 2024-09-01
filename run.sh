@@ -50,21 +50,41 @@ workspace_ps1() {
         return 1;
     fi
 
-    s=($(realpath --relative-to="$WORKSPACE_ROOT" . | sed "s/\// /"))
-
+    # shellcheck disable=SC1090
     source <(
+        # shellcheck disable=SC1091
         source "$WORKSPACE_ROOT/.workspace";
         echo "WORKSPACE_NAME=$WORKSPACE_NAME"
     )
 
-    if [ "${s[0]}" = '.' ]; then
+    local -r current_path="$(realpath --relative-to="$WORKSPACE_ROOT" .)"
+
+    if [ "${current_path}" = '.' ]; then
         echo "$WORKSPACE_NAME"
         return 0
     fi
 
-    z=($(echo "${s[1]}" | sed "s/\// /"))
+    local -r WORSPACE_PROJECT_PATH="$(echo "$current_path" | cut -d "/" -f1)"
 
-    echo "$WORKSPACE_NAME ${s[0]} ${z[0]} ${z[1]}"
+    # WORSPACE_PROJECT_NAME=
+
+    if [[ -f "$WORKSPACE_ROOT/$WORSPACE_PROJECT_PATH/.wrkspace" ]]; then
+        # shellcheck disable=SC1090
+        source <(
+            # shellcheck disable=SC1091
+            source "$WORKSPACE_ROOT/$WORSPACE_PROJECT_PATH/.wrkspace"
+            echo "WORSPACE_PROJECT_NAME=$WORKSPACE"
+        );
+    else
+        WORSPACE_PROJECT_NAME="$WORSPACE_PROJECT_PATH"
+    fi
+
+    local -r ZONE="$(echo "$current_path" | cut -d "/" -f2)"
+    local -r SUBPATH="$(realpath --relative-to="$WORKSPACE_ROOT/$WORSPACE_PROJECT_PATH/${ZONE}" .)"
+
+    # z=($(echo "${s[1]}" | sed "s/\// /"))
+
+    echo "$WORKSPACE_NAME ${WORSPACE_PROJECT_NAME} ${ZONE} ${SUBPATH}"
 }
 
 workspace_help() {
@@ -81,6 +101,8 @@ Options:
 Commands:
     ps1
     \t prints workspace data in the current format:  WORSPACE_ROOT WORKSPACE ZONE SUBPATH
+
+    \t if WORKSPACE_PWD_DISABLE is set, this command return 1
 
     new-root
     \t create a new workspace root
@@ -239,7 +261,7 @@ workspace-create() {
 
     cd "${WORKSPACE_PATH}"
 
-    echo "WORKSPACE_NAME=\"${WORKSPACE_NAME}\""> .wrkspace
+    echo "WORKSPACE=\"${WORKSPACE_NAME}\""> .wrkspace
 
     cd ./core;
 
@@ -256,7 +278,10 @@ workspace() {
     case $OPTION in
         init) workspace-init;;
         -h|--help) workspace_help;;
-        ps1) workspace_ps1;;
+        ps1)
+            # disable
+            [[ -v WORKSPACE_PWD_DISABLE ]] && return 1;
+            workspace_ps1;;
         new-root) workspace-root-creator "$@";;
         go) workspace-go "$@";;
         list) workspace-list "$@";;
