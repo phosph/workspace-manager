@@ -213,9 +213,9 @@ workspace() {
     output="$(workspace_manager "$@")"
     declare -i return_value="$?"
     if [ $return_value -eq 3 ]; then
-        eval "$output"
-    else
         cd "$output"
+    else
+        echo "$output"
         return $return_value;
     fi
 }
