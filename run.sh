@@ -27,7 +27,6 @@ _validate_workspace_root() {
 
     # local WORKSPACE_ROOT=
     if [[ $WORKSPACE_ROOT ]]; then
-        echo "$WORKSPACE_ROOT" >&2
         if [[ ! -e "$WORKSPACE_ROOT/.workspace"  ]]; then
             echo "workspace invalid" >&2
             return 1;
