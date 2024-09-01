@@ -111,6 +111,7 @@ Commands:
         <ZONE> = core|doc
 
     \t go to WORKSPACE, if <ZONE> is not provided, core is used.
+    \t if WORKSPACE is \"/\", is considered as the workspace root
 
     list
     \t list all workspaces at WORKSPACE_ROOT
@@ -198,29 +199,33 @@ workspace-path() {
 
 
 workspace-go() {
-    _validate_workspace_root;
 
     local WORKSPACE_PATH
 
-    WORKSPACE_PATH="$(workspace-path "$@")"
-    shift;
-
-    local ZONE="core"
-
-    if [[ "$1" =~ ^-z|(-zone)$ ]]; then
-        [[ -z "$2" ]] && {
-            echo "Invalid zone" >&2
-            return 1;
-        }
-
-        ZONE="$2"
-    fi
-
-    if [[ ! -d "$WORKSPACE_PATH/$ZONE" ]]; then
-        echo "zone '$ZONE' does not exist" >&2;
-        return 1;
+    if [[ "$1" == "/" ]]; then
+        _validate_workspace_root;
+        WORKSPACE_PATH="$WORKSPACE_ROOT"
     else
-        WORKSPACE_PATH="$WORKSPACE_PATH/$ZONE"
+        WORKSPACE_PATH="$(workspace-path "$@")"
+        shift;
+
+        local ZONE="core"
+
+        if [[ "$1" =~ ^-z|(-zone)$ ]]; then
+            [[ -z "$2" ]] && {
+                echo "Invalid zone" >&2
+                return 1;
+            }
+
+            ZONE="$2"
+        fi
+
+        if [[ ! -d "$WORKSPACE_PATH/$ZONE" ]]; then
+            echo "zone '$ZONE' does not exist" >&2;
+            return 1;
+        else
+            WORKSPACE_PATH="$WORKSPACE_PATH/$ZONE"
+        fi
     fi
 
     echo "$WORKSPACE_PATH"
