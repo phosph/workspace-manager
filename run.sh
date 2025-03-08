@@ -121,12 +121,12 @@ Commands:
     path -c|--current
     \t prints the workspace path. If --current is provided instead, the current workdpsace will be printed if any
 
-    create <WORKSPACE>
+    create <WORKSPACE> [-f|--force]
     \t create a new worspace
 "
 }
 
-PROGRAM_NAME="$0"
+PROGRAM_NAME="$(basename "$0")"
 
 workspace-root-creator() {
     echo "Workspace root creator"
@@ -258,7 +258,7 @@ workspace-create() {
 
     WORKSPACE_PATH="$WORKSPACE_ROOT/${WORKSPACE_NAME}"
 
-    if [[ -e $WORKSPACE_PATH ]]; then
+    if [[ -e $WORKSPACE_PATH ]] && ! [[ "$2" =~ ^-f|(-force)$ ]]; then
         echo "Workspace $WORKSPACE_NAME already exist" >&2
         exit 1;
     fi
