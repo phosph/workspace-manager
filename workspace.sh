@@ -2,6 +2,8 @@
 
 set -e
 
+PROGRAM_NAME="$(basename "$0")"
+
 __workspace_folder_worspace() {
   path=$(pwd)
   while [[ "$path" != "" && ! -e "$path/.workspace" ]]; do
@@ -126,7 +128,6 @@ Commands:
 "
 }
 
-PROGRAM_NAME="$(basename "$0")"
 
 workspace-root-creator() {
     echo "Workspace root creator"
@@ -237,7 +238,7 @@ workspace-init() {
     # shellcheck disable=SC2016
     echo '
 workspace() {
-    output="$(workspace_manager "$@")"
+    output="$(workspace.sh "$@")"
     declare -i return_value="$?"
     if [ $return_value -eq 3 ]; then
         cd "$output"

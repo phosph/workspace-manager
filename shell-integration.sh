@@ -1,32 +1,54 @@
 #!/usr/bin/env bash
 
-_idk() {
-    # echo "$1"
-    # echo "$2"
-    # echo "$3"
-    # local IFS=$' \t\n'    # normalize IFS
-    # local generic=true
+_workspace_completions() {
+    local cur_word prev_word
+    cur_word="${COMP_WORDS[COMP_CWORD]}"
+    prev_word="${COMP_WORDS[COMP_CWORD - 1]}"
+    local command="${COMP_WORDS[1]}"
 
-    local OPTIONS="--create -g --go -z --zone -c --current -h --help"
-    local previous_word
-    local current_word
-    current_word="${COMP_WORDS[COMP_CWORD]}"
-    previous_word="${COMP_WORDS[COMP_CWORD - 1]}"
+    # Lista de comandos principales
+    local commands="ps1 new-root go list path create init help"
 
-    # if [[ $generic == true ]]; then
-        # # compgen prints paths one per line; could also use while loop
-        # IFS=$' '
-        
+    # Si es el primer argumento, autocompletar con los comandos
+    if [ "${COMP_CWORD}" -eq 1 ]; then
+        COMPREPLY=($(compgen -W "${commands}" -- "${cur_word}"))
+        return 0
+    fi
 
-        # shellcheck disable=SC2207
-    case "${previous_word}" in
-        --create) COMPREPLY=($(compgen -E -- "$current_word"));;
-        -g|--go) COMPREPLY=("");;
-        -*) COMPREPLY=($(compgen -W "$OPTIONS" -- "$current_word")) ;;
+    case "${command}" in
+        go)
+            if [[ "${prev_word}" == "-z" || "${prev_word}" == "--zone" ]]; then
+                COMPREPLY=($(compgen -W "core doc" -- "${cur_word}"))
+                return 0
+            fi
+            # Obtener lista de workspaces y añadir opciones
+            local workspaces
+            workspaces=$(workspace.sh list 2>/dev/null | tail -n +2 | xargs)
+            local go_opts="-z --zone"
+            COMPREPLY=($(compgen -W "${workspaces} ${go_opts} /" -- "${cur_word}"))
+            ;;
+        path)
+            local workspaces
+            workspaces=$(workspace.sh list 2>/dev/null | tail -n +2 | xargs)
+            local path_opts="-c --current"
+            COMPREPLY=($(compgen -W "${workspaces} ${path_opts}" -- "${cur_word}"))
+            ;;
+        create)
+            if [[ "${COMP_CWORD}" -eq 2 ]]; then
+                # No hay sugerencias para el nombre del nuevo workspace
+                COMPREPLY=()
+            elif [[ "${COMP_CWORD}" -eq 3 ]]; then
+                COMPREPLY=($(compgen -W "-f --force" -- "${cur_word}"))
+            fi
+            ;;
+        *)
+            # No hay autocompletado para otros comandos
+            COMPREPLY=()
+            ;;
     esac
-        # IFS=$' \t\n'
-        # fi
-    return 0
-} >./idk.log
 
-complete -F _idk workspace
+    return 0
+}
+
+complete -F _workspace_completions workspace.sh
+complete -F _workspace_completions workspace
