@@ -1,0 +1,7 @@
+{
+    "recommendations": [
+        "mads-hartmann.bash-ide-vscode",
+        "jeff-hykin.better-shellscript-syntax",
+        "editorconfig.editorconfig"
+    ]
+}
